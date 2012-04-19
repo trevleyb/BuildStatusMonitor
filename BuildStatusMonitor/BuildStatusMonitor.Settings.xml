@@ -12,13 +12,12 @@
     <Controller Name="Monitor1" Monitor="TeamCityMonitor#1" Visualiser="FileTrace1" Transition="Transition2"/>
     <Controller Name="Monitor2" Monitor="TeamCityMonitor#2" Visualiser="FileTrace2" Transition="Transition2"/>
     <Controller Name="Monitor3" Monitor="TeamCityMonitor#3" Visualiser="FileTrace3" Transition="Transition2"/>
-    <!-- <Controller Name="EXO Business Monitor"    Monitor="TeamCityMonitor#2" Visualiser="DelcomLight#2"/> -->
   </Controllers>
   
   <Monitors>
     <Monitor Name="TeamCityMonitor#1" Assembly="BuildStatusMonitor" Class="BuildStatusMonitor.Monitors.TeamCityMonitor">
       <Settings>
-        <Setting Name="Host" Value="nzakledci01:8080" />
+        <Setting Name="Host" Value="host:8080" />
         <Setting Name="User" Value="guest" />
         <Setting Name="Password" Value="guest" />
         <Setting Name="UseGuest" Value="true" />
@@ -36,7 +35,7 @@
 
     <Monitor Name="TeamCityMonitor#2" Assembly="BuildStatusMonitor" Class="BuildStatusMonitor.Monitors.TeamCityMonitor">
       <Settings>
-        <Setting Name="Host" Value="nzakledci01:8080" />
+        <Setting Name="Host" Value="host:8080" />
         <Setting Name="User" Value="guest" />
         <Setting Name="Password" Value="guest" />
         <Setting Name="UseGuest" Value="true" />
@@ -52,7 +51,7 @@
 
     <Monitor Name="TeamCityMonitor#3" Assembly="BuildStatusMonitor" Class="BuildStatusMonitor.Monitors.TeamCityMonitor">
       <Settings>
-        <Setting Name="Host" Value="nzakledci01:8080" />
+        <Setting Name="Host" Value="host:8080" />
         <Setting Name="User" Value="guest" />
         <Setting Name="Password" Value="guest" />
         <Setting Name="UseGuest" Value="true" />
