@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<BuildStatusConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Settings>
+    <Setting Name="PollFrequency" Value="5" />
+  </Settings>
+
+   <Schedules DefaultState="OFF">
+      <Schedule DayOfWeek="Week" StartTime="8:00AM" FinishTime="10:00PM" State="ON" />
+   </Schedules>
+  
+  <Controllers>
+    <Controller Name="Monitor1" Monitor="TeamCityMonitor#1" Visualiser="FileTrace1" Transition="Transition2"/>
+    <Controller Name="Monitor2" Monitor="TeamCityMonitor#2" Visualiser="FileTrace2" Transition="Transition2"/>
+    <Controller Name="Monitor3" Monitor="TeamCityMonitor#3" Visualiser="FileTrace3" Transition="Transition2"/>
+    <!-- <Controller Name="EXO Business Monitor"    Monitor="TeamCityMonitor#2" Visualiser="DelcomLight#2"/> -->
+  </Controllers>
+  
+  <Monitors>
+    <Monitor Name="TeamCityMonitor#1" Assembly="BuildStatusMonitor" Class="BuildStatusMonitor.Monitors.TeamCityMonitor">
+      <Settings>
+        <Setting Name="Host" Value="nzakledci01:8080" />
+        <Setting Name="User" Value="guest" />
+        <Setting Name="Password" Value="guest" />
+        <Setting Name="UseGuest" Value="true" />
+        <Setting Name="ProjectID" Value="project2" />
+        <Setting Name="ProjectID" Value="project6" />
+        <Setting Name="ProjectID" Value="project4" />
+
+        <!--
+        <Setting Name="BuildID" Value="Value1" />
+        <Setting Name="ProjectID" Value="Value1" />
+        <Setting Name="ProjectName" Value="Value1" />
+        -->
+      </Settings>
+    </Monitor>
+
+    <Monitor Name="TeamCityMonitor#2" Assembly="BuildStatusMonitor" Class="BuildStatusMonitor.Monitors.TeamCityMonitor">
+      <Settings>
+        <Setting Name="Host" Value="nzakledci01:8080" />
+        <Setting Name="User" Value="guest" />
+        <Setting Name="Password" Value="guest" />
+        <Setting Name="UseGuest" Value="true" />
+        <Setting Name="ProjectID" Value="project8" />
+
+        <!--
+        <Setting Name="BuildID" Value="Value1" />
+        <Setting Name="ProjectID" Value="Value1" />
+        <Setting Name="ProjectName" Value="Value1" />
+        -->
+      </Settings>
+    </Monitor>
+
+    <Monitor Name="TeamCityMonitor#3" Assembly="BuildStatusMonitor" Class="BuildStatusMonitor.Monitors.TeamCityMonitor">
+      <Settings>
+        <Setting Name="Host" Value="nzakledci01:8080" />
+        <Setting Name="User" Value="guest" />
+        <Setting Name="Password" Value="guest" />
+        <Setting Name="UseGuest" Value="true" />
+        <Setting Name="BuildID" Value="bt13" />
+        <Setting Name="BuildID" Value="bt21" />
+        <Setting Name="BuildID" Value="bt22" />
+      </Settings>
+    </Monitor>
+  </Monitors>
+  
+  <Visualisers>
+    <Visualiser Name="DelcomLight#1" Assembly="BuildStatusMonitor" Class="BuildStatusMonitor.Visualisers.DelcomVisualiser">
+      <Settings>
+        <Setting Name="DeviceID" Value="\\?\hid#vid_0fc5&amp;pid_b080#7&amp;141d6465&amp;0&amp;0000#{4d1e55b2-f16f-11cf-88cb-001111000030}" />
+      </Settings>
+    </Visualiser>
+    <Visualiser Name="DelcomLight#2" Assembly="BuildStatusMonitor" Class="BuildStatusMonitor.Visualisers.DelcomVisualiser">
+      <Settings>
+        <Setting Name="DeviceID" Value="\\?\hid#vid_0fc5&amp;pid_b080#7&amp;26d7150a&amp;0&amp;0000#{4d1e55b2-f16f-11cf-88cb-001111000030}" />
+      </Settings>
+    </Visualiser>
+    <Visualiser Name="FileTrace1" Assembly="BuildStatusMonitor" Class="BuildStatusMonitor.Visualisers.FileTraceVisualiser">
+      <Settings>
+        <Setting Name="File" Value="C:\Status1.Log" />
+      </Settings>
+    </Visualiser>
+    <Visualiser Name="FileTrace2" Assembly="BuildStatusMonitor" Class="BuildStatusMonitor.Visualisers.FileTraceVisualiser">
+      <Settings>
+        <Setting Name="File" Value="C:\Status2.Log" />
+      </Settings>
+    </Visualiser>
+    <Visualiser Name="FileTrace3" Assembly="BuildStatusMonitor" Class="BuildStatusMonitor.Visualisers.FileTraceVisualiser">
+      <Settings>
+        <Setting Name="File" Value="C:\Status3.Log" />
+      </Settings>
+    </Visualiser>
+  </Visualisers>
+
+  <Transitions>
+    <Transition Name="Transition1">
+      <State Name="Unknown" Action="YELLOW:ON" />
+      <State Name="Success" Action="GREEN:ON">
+        <SubState Name="Success1" Condition="TIME:0-15" Action="GREEN:FLASH" />
+      </State>
+      <State Name="SuccessInProgress" Action="GREEN:ON;YELLOW:FLASH">
+        <SubState Name="SuccessInProgress1" Condition="TIME:0-15" Action="GREEN:FLASH;YELLOW:FLASH" />
+      </State>
+      <State Name="Failed" Action="RED:ON">
+        <SubState Name="Failed1" Condition="TIME:00-15" Action="RED:FLASH-SLOW" />
+        <SubState Name="Failed2" Condition="TIME:15-30" Action="RED:FLASH" />
+        <SubState Name="Failed3" Condition="TIME:30-60" Action="RED:FLASH-FAST" />
+      </State>
+      <State Name="FailedInProgress" Action="RED:ON;YELLOW:FLASH" />
+      <State Name="InProgress" Action="YELLOW:FLASH" />
+      <State Name="Error" Action="RED:FLASH" />
+    </Transition>
+    
+    <Transition Name="Transition2">
+      <State Name="Unknown" Action="Build State is UNKNOWN" />
+      <State Name="Success" Action="Build was Sucessfull">
+        <SubState Name="Success1" Condition="TIME:0-2" Action="Build Sucessfull - Ready For QA" />
+      </State>
+      <State Name="SuccessInProgress" Action="Last build was Sucessfull. New Build in Progress">
+        <SubState Name="SuccessInProgress1" Condition="TIME:0-2" Action="Build Sucessfull - Ready For QA. New Build in Progress" />
+      </State>
+      <State Name="Failed" Action="Build Failed.">
+        <SubState Name="Failed1" Condition="TIME:0-2" Action="Build Failed: First Warning" />
+        <SubState Name="Failed2" Condition="TIME:2-4" Action="Build Failed: Second Warning" />
+        <SubState Name="Failed3" Condition="TIME:4-6" Action="Build Failed: Third Warning" />
+      </State>
+      <State Name="FailedInProgress" Action="Build Failed - New Build in Progress">
+        <SubState Name="FailedInProgress1" Condition="TIME:0-2" Action="Build Failed: First Warning - in progress" />
+        <SubState Name="FailedInProgress2" Condition="TIME:2-4" Action="Build Failed: Second Warning - in progress" />
+        <SubState Name="FailedInProgress3" Condition="TIME:4-6" Action="Build Failed: Third Warning - in progress" />
+      </State>
+      <State Name="InProgress" Action="Build in Progress - Previus State is Unknown" />
+      <State Name="Error" Action="WARNING: Unknown Error Has Occurred" />
+    </Transition>
+  </Transitions>
+</BuildStatusConfig>

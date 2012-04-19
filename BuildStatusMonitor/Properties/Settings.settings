@@ -1,0 +1,18 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="BuildStatusMonitor.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="LogFileName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">C:\BuildStatusMonitor.Log</Value>
+    </Setting>
+    <Setting Name="LogFileSize" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">25</Value>
+    </Setting>
+    <Setting Name="LogLevel" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Verbose</Value>
+    </Setting>
+    <Setting Name="ConfigurationFile" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">BuildStatusMonitor.Settings.XML</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
