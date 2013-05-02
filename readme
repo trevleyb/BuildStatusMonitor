@@ -1,0 +1,5 @@
+Build Monitor - controls DelCom lights from teamCity. 
+
+Windows Service which polls TeamCity and controls colored lights for Build Visualisation. 
+
+See the documentation in the DOC folder for more details. 
