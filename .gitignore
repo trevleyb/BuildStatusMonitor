@@ -1,7 +1,6 @@
 # Compiled source #
 ###################
 *.com
-*.dll
 *.exe
 bin
 obj
