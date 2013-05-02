@@ -1,0 +1,227 @@
+<html>
+<title>TeamCity Build Status Monitor for DelCom lights</title>
+<body>
+<h1>TeamCity Build Status Monitor for DelCom lights</h1>
+<h2>Overview</h2>
+<div>Build Status Monitor lights are USB lights which are configured to show the status of builds on a build server. The software which controls the lights was developed by the ED PD Development Team and so is configurable and customisable to support different build server platforms and different monitoring tools. </div>
+<div>&nbsp;</div>
+<div><font size=4>What do the lights mean?</font></div>
+<div><img alt="" src="Build%20Traffic%20Light%20States.png"></div>
+<ul>
+<li><font color="#ff0000">RED</font> = One or more configurations have failed for the project. </li>
+<li><em><font color="#ff0000">RED (FLASHING)</font> = A build failed in the last 10 minutes;</em></li>
+<li><font color="#ff0000">RED</font> + <font color="#ffff00">YELLOW (FLASHING)</font> = The last build failed however a new build is in progress</li>
+<li><font color="#00ff00">GREEN </font>= All builds are sucessfull</li>
+<li><em><font color="#00ff00">GREEN (FLASHING) </font>= A successfull build finished in the last 10 minutes. </em></li>
+<li><font color="#00ff00">GREEN </font>+ <font color="#ffff00">YELLOW (FLASHING)</font> = The last build was sucessfull and a new build is in progress</li>
+<li><font color="#ffff00">YELLOW (FLASHING)</font>&nbsp;= A build is in progress however the last state is un-determinable. </li></ul>
+<p>Notes:</p>
+<ol>
+<li>The RED (FLASHING) and GREEN (FLASHING) options will be implemented early March. </li>
+<li>If a build is cancelled then the last known state is undeterminable and so only YELLOW is shown. </li></ol>
+<h3>Build Status Support</h3>
+<div>Currently, the Build Status Monitor Supports the following:</div>
+<div>&nbsp;</div>
+<h4>Monitors</h4>
+<div>
+<ul>
+<li>Team City - Provides monitoring of a Team City Build Server</li></ul></div>
+<h4>Visualisers</h4>
+<ul>
+<li>HID USB Lights - Provides Support for DelCon USB HID Lights</li>
+<li>Text Files - Provides Status Information to a Text File</li></ul>
+
+<h2>Build Status Monitors</h2>
+<div>A Monitor is a class which Monitors the data from another location. What gets monitored can be anything but normally the monitoring is a external build server through a web interface. </div>
+<div>&nbsp;</div>
+<div>Monitors are plugins which are dynamically loaded via config and simply return a result to the controller. The controller (The Monitoring Application) then passes that information through to a Visualiser. </div>
+<div>&nbsp;</div>
+<div>Configuration data for Monitors is through Key/Value pairs stored in the configuration file. </div></div>
+
+<h2>Build Status Visualisers</h2>
+<div>A Visualiser is simply a plugin which controls a visulaisation device. As a plug in it is dynamically loaded from an assembly by the Build Status Monitor Controller and multiple monitors can be configured and sused concurrently. </div>
+<div>&nbsp;</div>
+<div>Each Visualiser receives data from a Monitor and it is up to the Visualiser to decide what to do with the data it recieves. </div>
+<div>&nbsp;</div>
+<div>Currently there are 2 Visualisers:</div>
+<div>&nbsp;</div>
+<h3>DelCon HID USB Light Visualiser</h3>
+<div>Tthe Delcon HID USB Visualiser is a visualiser which knows how to control a Delcon light. It uses the Delcon API to change the lights, turn them on or off or make them flash. Each light has a unique ID which unfortunately changes at times (seems to be dynamic) and is different when pluged into different machines. </div>
+<div>&nbsp;</div>
+<div>Therefore, what has to happen is that the Build Monitor Application needs to be run in INFORMATION mode so you can get the HID Key before setting up the configuration data. </div>
+<div>&nbsp;</div>
+<div>To do this, a number of steps are currently required:</div>
+<div>
+<ol>
+<li>Modify the BuildStatusMonitor.exe.config file and set the LogLevel to <strong>Information</strong></li>
+<li>run BuildStatusMonitor.exe&nbsp;--run from the command line </li>
+<li>Review the BuildStatusMonitor.log file created. </li></ol></div>
+<p>If it runs sucessfully you will have a BuildStatusMonitor.Log file which contains the HID light keys. The data will look like this:</p>
+<p>17/02/2012 9:32:14 AM,[1]&nbsp;INFORMATION&nbsp;:Log File Initialised: C:\BuildStatusMonitor\BuildStatusMonitor.Log for severity 'INFORMATION'<br>17/02/2012 9:32:14 AM,[1]&nbsp;INFORMATION&nbsp;:BuildStatusMonitor Application Starting.<br>17/02/2012 9:32:14 AM,[1]&nbsp;INFORMATION&nbsp;:Current Directory is 'C:\BuildStatusMonitor'<br>17/02/2012 9:32:14 AM,[1]&nbsp;INFORMATION&nbsp;:Assembly Directory is 'C:\BuildStatusMonitor\BuildStatusMonitor.exe'<br>17/02/2012 9:32:14 AM,[1]&nbsp;INFORMATION&nbsp;:Logging the atached Delcom Lights.<br>17/02/2012 9:32:14 AM,[1]&nbsp;INFORMATION&nbsp;:<strong>\\?\hid#vid_0fc5&amp;pid_b080#6&amp;1cb2b5da&amp;0&amp;0000#{4d1e55b2-f16f-11cf-88cb-001111000030}</strong><br>17/02/2012 9:32:14 AM,[1]&nbsp;INFORMATION&nbsp;:<strong>\\?\hid#vid_0fc5&amp;pid_b080#6&amp;78b522f&amp;0&amp;0000#{4d1e55b2-f16f-11cf-88cb-001111000030}</strong><br>17/02/2012 9:32:14 AM,[1]&nbsp;INFORMATION&nbsp;:Running in Test Mode.<br></p>
+<div>In the log above you can see the two Delcom lights and their ID's. You need to copy the ID's to put into the configuration file. See the [[Build Status Configuration]] page for more details. </div>
+<div>&nbsp;</div>
+<div>Running in --run mode runs a single poll and visualisation. </div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<h3>Text File Visualiser</h3>
+<div>&nbsp;</div>
+<div>The Text File Visualiser simply outputs the build status information to a text file. You cannot use the same text file for more than one visualiser. </div>
+<div>&nbsp;</div>
+<div>The name of the file to write to is defined in the Log File using the Key/Value pairs as defined in the [[Build Status Configuration]] Page. </div>
+<div>&nbsp;</div>
+<div>A sample text file output is as follows:</div>
+<div>&nbsp;</div>
+<div>02/14/2012 16:10:54&nbsp; EBMonitor&nbsp;Status = 'OK'<br>02/15/2012 06:00:05&nbsp; EBMonitor&nbsp;Status = 'OK'<br>02/15/2012 12:28:40&nbsp; Project Release Version&nbsp;Status = 'SuccessInProgress'<br>02/15/2012 13:50:48&nbsp; EBMonitor&nbsp;Status = 'OK'<br>02/15/2012 15:16:01&nbsp; Project Release Version&nbsp;Status = 'SuccessInProgress'<br>02/15/2012 19:06:08&nbsp; EBMonitor&nbsp;Status = 'OK'<br>02/15/2012 19:06:12&nbsp; Project Release Version&nbsp;Status = 'SuccessInProgress'<br>02/16/2012 06:00:02&nbsp; EBMonitor&nbsp;Status = 'OK'<br>02/16/2012 06:28:14&nbsp; Project Release Version&nbsp;Status = 'SuccessInProgress'<br>02/16/2012 07:48:46&nbsp; EBMonitor&nbsp;Status = 'OK'<br>02/16/2012 12:39:48&nbsp; Project Release Version&nbsp;Status = 'SuccessInProgress'<br>02/16/2012 13:45:09&nbsp; EBMonitor&nbsp;Status = 'OK'<br>02/16/2012 14:22:28&nbsp; Project Release Version&nbsp;Status = 'SuccessInProgress'<br>02/16/2012 15:34:44&nbsp; EBMonitor&nbsp;Status = 'OK'<br>02/16/2012 16:17:23&nbsp; Project Release Version&nbsp;Status = 'SuccessInProgress'<br>02/16/2012 17:52:11&nbsp; EBMonitor&nbsp;Status = 'OK'<br>02/16/2012 18:12:48&nbsp; Project Release Version&nbsp;Status = 'SuccessInProgress'<br>02/17/2012 08:53:56&nbsp; EBMonitor&nbsp;Status = 'OK'<br>02/17/2012 09:32:16&nbsp; EBMonitor&nbsp;Status = 'OK'<br>02/17/2012 09:33:08&nbsp; EBMonitor&nbsp;Status = 'OK'</div>
+<h2>Build Status Configuration</h2>
+<div>Configuration is managed through a XML file called BuildStatusMonitor.settings.xml (or whatever is defined in the BuildStatusMonitor.exe.config file)</div>
+<div>&nbsp;</div>
+<div><font size=4>Build Status Monitor.exe.config</font></div>
+<div>&nbsp;</div>
+<div>The BuildStatusMonitor.exe.config file is a standard .net configuration file which looks like this:</div>
+<div>&nbsp;</div>
+<div>&lt;?xml version=&quot;1.0&quot;?&gt;<br>&lt;configuration&gt;<br>&lt;configSections&gt;<br>&nbsp;&nbsp;&nbsp; &lt;sectionGroup name=&quot;applicationSettings&quot; type=&quot;System.Configuration.ApplicationSettingsGroup, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089&quot; &gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;section name=&quot;BuildStatusMonitor.Properties.Settings&quot; type=&quot;System.Configuration.ClientSettingsSection, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089&quot; requirePermission=&quot;false&quot; /&gt;<br>&nbsp;&nbsp;&nbsp; &lt;/sectionGroup&gt;<br>&lt;/configSections&gt;<br>&lt;startup&gt;<br>&nbsp; &lt;supportedRuntime version=&quot;v4.0&quot; sku=&quot;.NETFramework,Version=v4.0&quot;/&gt;&lt;/startup&gt;<br>&nbsp;&nbsp;&nbsp; &lt;applicationSettings&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;BuildStatusMonitor.Properties.Settings&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;setting name=&quot;LogFileName&quot; serializeAs=&quot;String&quot;&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;value&gt;C:\BuildStatusMonitor\BuildStatusMonitor.Log&lt;/value&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/setting&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;setting name=&quot;LogFileSize&quot; serializeAs=&quot;String&quot;&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;value&gt;25&lt;/value&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/setting&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;setting name=&quot;LogLevel&quot; serializeAs=&quot;String&quot;&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;value&gt;Warnining&lt;/value&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/setting&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;setting name=&quot;ConfigurationFile&quot; serializeAs=&quot;String&quot;&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;value&gt;C:\BuildStatusMonitor\BuildStatusMonitor.Settings.XML&lt;/value&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/setting&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/BuildStatusMonitor.Properties.Settings&gt;<br>&nbsp;&nbsp;&nbsp; &lt;/applicationSettings&gt;<br>&lt;/configuration&gt;</div>
+<div>&nbsp;</div>
+<div><font size=3>LogFileName</font></div>
+<div><font size=2>The LogFileName entry simply defines the name and location of the Log File for the application. </font></div>
+<div>&nbsp;</div>
+<div><font size=3>LogFileSize</font></div>
+<div><font size=2>The LogFileSize entry is a size, in MB, of the maximum size for the log file before the log file is rolled and a new log file is created. Old log files are renamed with a date/time stamp. </font></div>
+<div><font size=2></font>&nbsp;</div>
+<div><font size=3>LogLevel</font></div>
+<div><font size=2>The LogLevel defines the amount of detail required in the file. Valid settings are:</font></div>
+<div>
+<ul>
+<li><font size=2>Verbose - Everything</font></li>
+<li><font size=2>Information - Almost Everything</font></li>
+<li><font size=2>Warning - Only Warning and Errors are reported</font></li>
+<li><font size=2>Error - Only critical errors are reported</font></li></ul></div>
+<div><font size=2></font>&nbsp;</div>
+<div><font size=3>ConfigurationFile</font></div>
+<div><font size=2>The name of the configuration file which contains the details of the Visualisers and Monitors. </font></div>
+<div><font size=2></font>&nbsp;</div>
+<div>&nbsp;</div>
+<div><font size=4>BuildStatusMonitor.settings.xml file</font></div>
+<div>The BuildStatusMonitor.settings.xml file stores all the details about the management of the application. It defines Monitors, Visualisers, Settings, Combinations of Monitors and Visualisers and Polling information. </div>
+<div>&nbsp;</div>
+<div>A typcial file is as follows:</div>
+<div>&nbsp;</div>
+<div>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt; <br>&lt;BuildStatusConfig xmlns:xsi=&quot;<a href="http://www.w3.org/2001/XMLSchema-instance">http://www.w3.org/2001/XMLSchema-instance</a>&quot; xmlns:xsd=&quot;<a href="http://www.w3.org/2001/XMLSchema">http://www.w3.org/2001/XMLSchema</a>&quot;&gt;<br>&nbsp; &lt;Settings&gt;<br>&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;PollFrequency&quot; Value=&quot;5&quot; /&gt;<br>&nbsp; &lt;/Settings&gt;<br>&nbsp; <br>&nbsp; &lt;Schedules DefaultState=&quot;OFF&quot;&gt;<br>&nbsp;&lt;Schedule DayOfWeek=&quot;Week&quot; StartTime=&quot;6:00AM&quot; FinishTime=&quot;8:00PM&quot; State=&quot;ON&quot; /&gt;<br>&nbsp; &lt;/Schedules&gt;</div>
+<div>&nbsp; &lt;Controllers&gt;<br>&nbsp;&nbsp;&nbsp; &lt;Controller Name=&quot;Another Project Lights&quot; Monitor=&quot;ESMonitor&quot; Visualiser=&quot;DelcomLight#1&quot;/&gt;<br>&nbsp;&nbsp;&nbsp; &lt;Controller Name=&quot;Project Lights&quot;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Monitor=&quot;EBMonitor&quot; Visualiser=&quot;DelcomLight#2&quot;/&gt;<br>&nbsp;&nbsp;&nbsp; &lt;Controller Name=&quot;Another Project File&quot;&nbsp;&nbsp; Monitor=&quot;ESMonitor&quot; Visualiser=&quot;ESFileTrace&quot;/&gt;<br>&nbsp;&nbsp;&nbsp; &lt;Controller Name=&quot;Project File&quot;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Monitor=&quot;EBMonitor&quot; Visualiser=&quot;EBFileTrace&quot;/&gt;<br>&nbsp; &lt;/Controllers&gt;<br>&nbsp; <br>&nbsp; &lt;Monitors&gt;<br>&nbsp;&nbsp;&nbsp; &lt;Monitor Name=&quot;ESMonitor&quot; Assembly=&quot;BuildStatusMonitor&quot; Class=&quot;BuildStatusMonitor.Monitors.TeamCityMonitor&quot;&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Settings&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;Host&quot; Value=&quot;nzakledci01:8080&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;User&quot; Value=&quot;guest&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;Password&quot; Value=&quot;guest&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;UseGuest&quot; Value=&quot;true&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;ProjectID&quot; Value=&quot;project2&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;ProjectID&quot; Value=&quot;project6&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;ProjectID&quot; Value=&quot;project4&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;!--<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;BuildID&quot; Value=&quot;Value1&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;ProjectID&quot; Value=&quot;Value1&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;ProjectName&quot; Value=&quot;Value1&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; --&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/Settings&gt;<br>&nbsp;&nbsp;&nbsp; &lt;/Monitor&gt;</div>
+<div>&nbsp;&nbsp;&nbsp; &lt;Monitor Name=&quot;EBMonitor&quot; Assembly=&quot;BuildStatusMonitor&quot; Class=&quot;BuildStatusMonitor.Monitors.TeamCityMonitor&quot;&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Settings&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;Host&quot; Value=&quot;nzakledci01:8080&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;User&quot; Value=&quot;guest&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;Password&quot; Value=&quot;guest&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;UseGuest&quot; Value=&quot;true&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;BuildID&quot; Value=&quot;bt13&quot; /&gt;</div>
+<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;!--<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;BuildID&quot; Value=&quot;Value1&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;ProjectID&quot; Value=&quot;Value1&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;ProjectName&quot; Value=&quot;Value1&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; --&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/Settings&gt;<br>&nbsp;&nbsp;&nbsp; &lt;/Monitor&gt;<br>&nbsp; &lt;/Monitors&gt;<br>&nbsp; <br>&nbsp; &lt;Visualisers&gt;<br>&nbsp;&nbsp;&nbsp; &lt;Visualiser Name=&quot;DelcomLight#1&quot; Assembly=&quot;BuildStatusMonitor&quot; Class=&quot;BuildStatusMonitor.Visualisers.DelcomVisualiser&quot;&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Settings&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;DeviceID&quot; Value=&quot;<a href="file:///?\hid#vid_0fc5&amp;amp;pid_b080#6&amp;amp;1cb2b5da&amp;amp;0&amp;amp;0000#{4d1e55b2-f16f-11cf-88cb-001111000030">\\?\hid#vid_0fc5&amp;amp;pid_b080#6&amp;amp;1cb2b5da&amp;amp;0&amp;amp;0000#{4d1e55b2-f16f-11cf-88cb-001111000030</a>}&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/Settings&gt;<br>&nbsp;&nbsp;&nbsp; &lt;/Visualiser&gt;<br>&nbsp;&nbsp;&nbsp; &lt;Visualiser Name=&quot;DelcomLight#2&quot; Assembly=&quot;BuildStatusMonitor&quot; Class=&quot;BuildStatusMonitor.Visualisers.DelcomVisualiser&quot;&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Settings&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;DeviceID&quot; Value=&quot;<a href="file:///?\hid#vid_0fc5&amp;amp;pid_b080#6&amp;amp;78b522f&amp;amp;0&amp;amp;0000#{4d1e55b2-f16f-11cf-88cb-001111000030">\\?\hid#vid_0fc5&amp;amp;pid_b080#6&amp;amp;78b522f&amp;amp;0&amp;amp;0000#{4d1e55b2-f16f-11cf-88cb-001111000030</a>}&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/Settings&gt;<br>&nbsp;&nbsp;&nbsp; &lt;/Visualiser&gt;<br>&nbsp;&nbsp;&nbsp; &lt;Visualiser Name=&quot;EBFileTrace&quot; Assembly=&quot;BuildStatusMonitor&quot; Class=&quot;BuildStatusMonitor.Visualisers.FileTraceVisualiser&quot;&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Settings&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;File&quot; Value=&quot;C:\BuildStatusMonitor\EBBuildStatus.Log&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/Settings&gt;<br>&nbsp;&nbsp;&nbsp; &lt;/Visualiser&gt;<br>&nbsp;&nbsp;&nbsp; &lt;Visualiser Name=&quot;ESFileTrace&quot; Assembly=&quot;BuildStatusMonitor&quot; Class=&quot;BuildStatusMonitor.Visualisers.FileTraceVisualiser&quot;&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Settings&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;File&quot; Value=&quot;C:\BuildStatusMonitor\ESBuildStatus.Log&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/Settings&gt;<br>&nbsp;&nbsp;&nbsp; &lt;/Visualiser&gt;<br>&nbsp; &lt;/Visualisers&gt;<br>&lt;/BuildStatusConfig&gt;<br></div>
+<div><font size=3></font>&nbsp;</div>
+<div><font size=3>Settings</font></div>
+<div>&nbsp;</div>
+<div>The settings section defines Key/Value pairs of settings. Currently the only valid setting is PollFrequency which is set to 5 seconds. </div>
+<div>&nbsp;</div>
+<div><font size=3>Schedules</font></div>
+<div>&nbsp;</div>
+<div>Schedules allows the configuration of when the visualisers are turned ON or OFF. This is to save power and not have lights on during the night when no one is at home. </div>
+<div>&nbsp;</div>
+<div>The&nbsp;Schedules section contains one or more Schedule entries. </div>
+<div>&nbsp;</div>
+<div>Each Schedule has the following attributes:</div>
+<div>&nbsp;</div>EG : DayOfWeek=&quot;Week&quot; StartTime=&quot;6:00AM&quot; FinishTime=&quot;8:00PM&quot; State=&quot;ON&quot; 
+<ul>
+<li>DayOfWeek - Can be Week, Weekend, Monday, Tuesday, Wednesday... It defines the DAY that the entry takes affect</li>
+<li>StartTime - defines the time this entry starts (eg: 6:00AM) which will set the state to that defined by State. </li>
+<li>FinishTime - defines the time this entry stops (eg: 8:00PM) which will toggle the state </li>
+<li>State - The state to set the visualisers when the time event occurs. This is either ON or OFF. </li></ul>
+<p>In the example above, at 6:00AM the Visualisers will all be sent a ON message. At 8:00PM they will all be sent a OFF message.&nbsp;&nbsp;</p>
+<div><font size=3>Controllers</font></div>
+<div>&nbsp;</div>
+<div>Controllers define the combinations of Monitors and Visualisers. Simply they are named combinations and these are then created dynamically at run time. Any number of Controllers can be defined BUT a Visualiser can only be used once. You can use a Monitor more than once however. </div>
+<div>&nbsp;</div>
+<div>
+<div>EG: &lt;Controller Name=&quot;Another Project Lights&quot; Monitor=&quot;ESMonitor&quot; Visualiser=&quot;DelcomLight#1&quot;/&gt;<br></div></div>
+<div>&nbsp;</div>
+<div>In the example above, there are 4 Visualisers but only 2 Monitors and the same Monitors are used to control multiple Visualisers. </div>
+<ul>
+<li>Name - a Unique name for this Controller</li>
+<li>Monitor - Which monitor will this controller use</li>
+<li>Visualiser - Which visualiser will this controller use. </li></ul>
+<div><font size=3>Visualisers</font></div>
+<div>&nbsp;</div>
+<div>Visualisers define Visual things and the Visualisers section can have multiple Visualier entries. Each Visualiser entry defines a visualiser. </div>
+<div>&nbsp;</div>
+<div>For example the following defines a Visualiser for a Delcom Light. </div>
+<div>&nbsp;</div>
+<div>&nbsp;&lt;Visualiser Name=&quot;DelcomLight#1&quot; Assembly=&quot;BuildStatusMonitor&quot; Class=&quot;BuildStatusMonitor.Visualisers.DelcomVisualiser&quot;&gt;<br>&lt;Settings&gt;<br>&lt;Setting Name=&quot;DeviceID&quot; Value=&quot;<a href="file:///?\hid#vid_0fc5&amp;amp;pid_b080#6&amp;amp;1cb2b5da&amp;amp;0&amp;amp;0000#{4d1e55b2-f16f-11cf-88cb-001111000030">\\?\hid#vid_0fc5&amp;amp;pid_b080#6&amp;amp;1cb2b5da&amp;amp;0&amp;amp;0000#{4d1e55b2-f16f-11cf-88cb-001111000030</a>}&quot; /&gt;<br>&lt;/Settings&gt;<br>&lt;/Visualiser&gt;<br></div>
+<div>The key data to know is:</div>
+<ul>
+<li>Name - A Unique name for this Visualiser</li>
+<li>Assembly - in what .net assembly is the Plugin Found (normally the current executing one)</li>
+<li>Class - what is the class that will be instatiated which meets the IVisualiser Interface. </li>
+<li>Settings&nbsp;- defines the settings as Key/Value pairs. </li></ul>
+<p>The following Settings are valid:</p>
+<p><strong>DelcomVisualiser</strong>: Name=&quot;DeviceID&quot; Value=&quot;The ID of the Delcom light to be used. See [[Build Status Visualisers]] for more details&quot;</p>
+<p><strong>FileTraceVisualiser</strong>: Name=&quot;File&quot; Value=&quot;The file where the data will be output&quot;</p>
+<div><font size=3>Monitors</font></div>
+<div>&nbsp;</div>
+<div>Monitors monitor things and in the Monitors section multiple Monitor entries can be defined. Currently only the Team City monitor exist. To configure a monitor, the following settings are used. </div>
+<div>&nbsp;</div>
+<div>&lt;Monitor Name=&quot;ESMonitor&quot; Assembly=&quot;BuildStatusMonitor&quot; Class=&quot;BuildStatusMonitor.Monitors.TeamCityMonitor&quot;&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Settings&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;Host&quot; Value=&quot;nzakledci01:8080&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;User&quot; Value=&quot;guest&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;Password&quot; Value=&quot;guest&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;UseGuest&quot; Value=&quot;true&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;ProjectID&quot; Value=&quot;project2&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;ProjectID&quot; Value=&quot;project6&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;ProjectID&quot; Value=&quot;project4&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;!--<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;BuildID&quot; Value=&quot;Value1&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;ProjectID&quot; Value=&quot;Value1&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;Setting Name=&quot;ProjectName&quot; Value=&quot;Value1&quot; /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; --&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/Settings&gt;</div>
+<ul dir=ltr>
+<li>
+<div align=left>Name - a Unique name for the monitor</div></li>
+<li>
+<div align=left>Assembly - the .net assembly in which the monitor code exists</div></li>
+<li>
+<div align=left>Class - the class name of the monitor that adheres to the IMonitor interface</div></li></ul>
+<p align=left>The following Key/Value pairs are used :</p>
+<ul>
+<li>
+<div align=left>Host - the name and port of the Team City Server (do not include the http://)</div></li>
+<li>
+<div align=left>User - The user name to connect as (default guest)</div></li>
+<li>
+<div align=left>Password - the password to connect as</div></li>
+<li>
+<div align=left>UseGuest - use the guest connection (default true)</div></li></ul>
+<p align=left>The build monitor works by allowing you to monitor 1 or more build configurations. The output is defined as:</p>
+<ul>
+<li>
+<div align=left>All configurations as sucessfull = OK</div></li>
+<li>
+<div align=left>Any configuration failed = FAILED</div></li>
+<li>
+<div align=left>Any configuration building = INPROGRESS</div></li></ul>
+<p align=left>So the configuration allows you to add mutliple build configurations or individual builds to be monitored by this monitor. The settings are:</p>
+<ul>
+<li>
+<div align=left>ProjectID = the id of the project to monitor. ALL configurations defined in this project will be monitored</div></li>
+<li>
+<div align=left>BuildID&nbsp;= the id of a specific build configuration to monitor</div></li>
+<li>
+<div align=left>ProjectName = the name of the project to monitor rather than the ID but works like the ID</div></li></ul>
+<p align=left>For example, if Project1 had 3 build configurations (IDs 1, 2, 3) and Project 2 has 2 configurations (4, 5) then you could add:</p>
+<ul>
+<li>
+<div align=left>Name=&quot;ProjectID&quot; Value=&quot;2&quot;</div></li>
+<li>
+<div align=left>Name=&quot;BuildID&quot; Value=&quot;1&quot;</div></li>
+<li>
+<div align=left>Name=&quot;BuildID&quot; Value=&quot;3&quot;</div></li></ul>
+<p align=left>In this example, the monitor would monitor the status of the build configurations 1, 3, 4 and 5 only. </p>
+<h2>Build Status Installation</h2>
+<div>
+<div>The BuildStatusMonitor runs as a Windows Service. To install, copy the following files to a location on a machine that will act as a Build Status Monitor:</div>
+<div>&nbsp;</div>
+<div><strong>&nbsp;BuildStatusMonitor.exe<br>&nbsp;BuildStatusMonitor.exe.config<br>&nbsp;BuildStatusMonitor.Settings.xml<br>&nbsp;DelcomDLL.dll<br>&nbsp;EasyHttp.dll<br>&nbsp;JsonFx.dll<br>&nbsp;TeamCitySharp.dll</strong></div>
+<div>&nbsp;</div>
+<div>(These files can come from compiling the application or from an existing Build Monitor PC). </div>
+<div>&nbsp;</div>
+<div>1. Check the configuration settings in BuildStatusMonitor.exe.config and set LogLevel to Verbose</div>
+<div>2. Check that you have run with --run as setup the visualisers correctly (see [[Build Status Visualisers]] and [[Build Status Configuration]]</div>
+<div>3. Run <strong>BuildStatusMonitor.exe --install </strong>from the command line. </div>
+<div>4. Launch the service&nbsp;manager (right-click on Computer and select Manager and drill down to services)</div>
+<div>5. Check that the service is running (Build Status Monitor) if not, review the log file</div>
+<div>6. If it is running OK, review the log file, stop the service, change the LogLevel to Warning and restart the service. </div>
+<div>&nbsp;</div>
+<div><font size=3>Troubleshooting</font></div>
+<div>&nbsp;</div>
+<div>If there are issues, stop the service, set the LogLevel to Verbose and restart the service. Review the errors in the log file. </div></div>
+</blockquote>
+<p>&nbsp;</p>
+</body>
+</html>

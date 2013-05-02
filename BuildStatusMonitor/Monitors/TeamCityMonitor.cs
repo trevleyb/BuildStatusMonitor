@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using BuildStatusMonitor.Configuration;
 using BuildStatusMonitor.Utilities;
 using TeamCitySharp;

@@ -16,7 +16,7 @@
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -98,6 +98,9 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="ServiceInstaller.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Utilities\DelcomLights\DelcomLight.cs" />
     <Compile Include="Components\ComponentFactory.cs" />
     <Compile Include="Utilities\EventLogger.cs" />
@@ -127,6 +130,7 @@
     <Content Include="DelcomDLL.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\DelcomDLL.dll" />
     <Content Include="Resources\EasyHttp.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
